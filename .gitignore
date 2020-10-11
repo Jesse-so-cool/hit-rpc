@@ -1,0 +1,3 @@
+# Project exclude paths
+/hit-rpc-core/target/
+.idea
