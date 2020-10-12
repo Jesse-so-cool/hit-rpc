@@ -10,8 +10,14 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>hit-rpc-core</module>
-        <module>hit-rpc-server</module>
+        <module>hit-rpc-sample-client</module>
+        <module>hit-rpc-sample-service</module>
+        <module>hit-rpc-sample-server</module>
     </modules>
+
+    <properties>
+        <spring.version>5.2.6.RELEASE</spring.version>
+    </properties>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->

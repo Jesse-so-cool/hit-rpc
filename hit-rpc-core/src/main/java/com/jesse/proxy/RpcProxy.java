@@ -8,10 +8,10 @@ import net.sf.cglib.proxy.Enhancer;
  */
 public class RpcProxy<T> {
 
-    public T create(T delegate) {
+    public T create(Class<T> clazz) {
         Enhancer enhancer = new Enhancer();
-        enhancer.setCallback(new CglibInterceptor(delegate));
-        enhancer.setInterfaces(new Class[]{delegate.getClass()});
+        enhancer.setCallback(new CglibInterceptor());
+        enhancer.setInterfaces(new Class[]{clazz});
         return (T) enhancer.create();
     }
 

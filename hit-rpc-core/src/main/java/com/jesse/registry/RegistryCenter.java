@@ -1,5 +1,6 @@
 package com.jesse.registry;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -14,6 +15,6 @@ public class RegistryCenter implements Registry{
 
     @Override
     public List<String> discover(String serviceName) {
-        return null;
+        return Arrays.asList("localhost:8080");
     }
 }

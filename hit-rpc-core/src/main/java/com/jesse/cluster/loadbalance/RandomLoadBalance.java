@@ -10,8 +10,9 @@ import java.util.Set;
  * @date 2020/10/10
  */
 public class RandomLoadBalance implements LoadBalance {
+
     @Override
-    public String select(List<String> addressList) {
+    public String select(List<String> addressList, String serviceName) {
         return null;
     }
 }

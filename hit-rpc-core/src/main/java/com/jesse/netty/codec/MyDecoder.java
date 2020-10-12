@@ -26,6 +26,9 @@ public class MyDecoder extends ByteToMessageDecoder {
         }
         byteBuf.markReaderIndex();
         int dataLength = byteBuf.readInt();
+        if (dataLength < 0) {
+            channelHandlerContext.close();
+        }
         if (byteBuf.readableBytes() < dataLength) {
             byteBuf.resetReaderIndex();
             return;

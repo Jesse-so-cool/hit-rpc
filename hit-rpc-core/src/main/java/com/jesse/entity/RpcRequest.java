@@ -15,7 +15,7 @@ public class RpcRequest implements Serializable {
     private Class<?>[] parameterTypes;
     private Object[] parameters;
     private String requestId;
-
+    private String version;
 
     private int retries = 0;
     private byte rpcProtocolVersion;

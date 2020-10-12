@@ -20,12 +20,12 @@ import java.util.UUID;
  */
 public class CglibInterceptor implements MethodInterceptor {
 
-    final Object delegate;
+    //final Object delegate;
 
     private LoadBalance loadBalance = new RoundRobinLoadBalance();
 
-    CglibInterceptor(Object delegate) {
-        this.delegate = delegate;
+    CglibInterceptor() {
+
     }
 
     public void setLoadBalance(LoadBalance loadBalance) {
@@ -51,7 +51,7 @@ public class CglibInterceptor implements MethodInterceptor {
         request.setParameters(objects);
 
         RpcResponse response = nettyClient.request(request);
-        return response;
+        return response.getValue();
     }
 
 }

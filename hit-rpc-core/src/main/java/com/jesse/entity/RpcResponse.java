@@ -1,5 +1,7 @@
 package com.jesse.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -8,8 +10,9 @@ import java.util.Map;
  * @author jesse hsj
  * @date 2020/10/10
  */
+@Data
 public class RpcResponse implements Serializable {
-    private long requestId;
+    private String requestId;
     private Object value;
     private Exception exception;
 

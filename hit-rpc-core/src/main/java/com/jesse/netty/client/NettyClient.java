@@ -5,6 +5,7 @@ import com.jesse.entity.RpcResponse;
 import com.jesse.netty.codec.MyCodec;
 import com.jesse.netty.codec.MyDecoder;
 import com.jesse.netty.codec.MyEncoder;
+import com.jesse.serialization.KryoSerialization;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -37,15 +38,17 @@ public class NettyClient {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast("codec", new MyCodec());
-                    ch.pipeline().addLast(nettyClientHandler);
+                    ch.pipeline()
+                            .addLast(new MyEncoder(RpcRequest.class, new KryoSerialization())) // 将 RPC 请求进行编码（为了发送请求）
+                            .addLast(new MyDecoder(RpcResponse.class, new KryoSerialization()))
+                            .addLast(nettyClientHandler);
                 }
             });
 
             // 启动客户端
             ChannelFuture f = b.connect(host, port).sync();
             Channel channel = f.channel();
-            channel.writeAndFlush(rpcRequest);
+            channel.writeAndFlush(rpcRequest).sync();
             channel.closeFuture().sync();
             return nettyClientHandler.getRpcResponse();
         } finally {

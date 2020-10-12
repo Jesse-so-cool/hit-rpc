@@ -9,13 +9,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hit-rpc-server</artifactId>
+    <artifactId>hit-rpc-sample-client</artifactId>
 
     <dependencies>
         <dependency>
-            <artifactId>hit-rpc</artifactId>
-            <groupId>com.jesse</groupId>
+            <artifactId>hit-rpc-core</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <groupId>com.jesse</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>hit-rpc-sample-service</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <groupId>com.jesse</groupId>
         </dependency>
     </dependencies>
+
 </project>
