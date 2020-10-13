@@ -6,5 +6,5 @@ package com.jesse.cluster;
  */
 public interface HAStrategy {
     void setUrl(String url);
-    //Response call(Request request, LoadBalance loadBalance);//<1>
+    //Response call(Request connect, LoadBalance loadBalance);//<1>
 }

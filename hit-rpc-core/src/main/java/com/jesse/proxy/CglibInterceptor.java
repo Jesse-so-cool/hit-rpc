@@ -2,15 +2,16 @@ package com.jesse.proxy;
 
 import com.jesse.cluster.LoadBalance;
 import com.jesse.cluster.loadbalance.RoundRobinLoadBalance;
+import com.jesse.entity.ResponseFuture;
 import com.jesse.entity.RpcRequest;
 import com.jesse.entity.RpcResponse;
 import com.jesse.netty.client.NettyClient;
+import com.jesse.netty.client.NettyClientHandler;
 import com.jesse.registry.RegistryCenter;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,8 +51,10 @@ public class CglibInterceptor implements MethodInterceptor {
         request.setParameterTypes(method.getParameterTypes());
         request.setParameters(objects);
 
-        RpcResponse response = nettyClient.request(request);
-        return response.getValue();
+        //map.getHandler.request
+        NettyClientHandler client = NettyClient.getClientHandler(address);
+        ResponseFuture future = client.request(request);
+        return future.get();
     }
 
 }

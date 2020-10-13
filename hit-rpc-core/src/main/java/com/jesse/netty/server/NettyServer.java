@@ -5,6 +5,8 @@ import com.jesse.entity.RpcResponse;
 import com.jesse.netty.codec.MyCodec;
 import com.jesse.netty.codec.MyDecoder;
 import com.jesse.netty.codec.MyEncoder;
+import com.jesse.netty.heartbeat.Beat;
+import com.jesse.netty.heartbeat.HeartbeatServerHandler;
 import com.jesse.serialization.KryoSerialization;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -16,9 +18,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author jesse hsj
@@ -50,9 +54,11 @@ public class NettyServer {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             // 添加日志
-                            ch.pipeline().addLast("logging", new LoggingHandler(LogLevel.INFO))
+                            ch.pipeline()
+                                    .addLast(new IdleStateHandler(0, 0, Beat.BEAT_SERVER, TimeUnit.SECONDS))
+                                    .addLast(new HeartbeatServerHandler())
                                     .addLast(new MyDecoder(RpcRequest.class, new KryoSerialization()))
-                                    .addLast(new MyEncoder(RpcResponse.class, new KryoSerialization())) // 将 RPC 请求进行编码（为了发送请求）
+                                    .addLast(new MyEncoder(RpcResponse.class, new KryoSerialization()))
                                     .addLast(new NettyServerHandler(exportServices));
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
