@@ -42,7 +42,7 @@ public class CglibInterceptor implements MethodInterceptor {
         //负载均衡策略
         String address = loadBalance.select(ls,declaringClass.getName());
         String[] split = address.split(":");
-        NettyClient nettyClient = new NettyClient(split[0], Integer.parseInt(split[1]));
+        //NettyClient nettyClient = new NettyClient(split[0], Integer.parseInt(split[1]));
         RpcRequest request = new RpcRequest();
 
         request.setRequestId(UUID.randomUUID().toString());

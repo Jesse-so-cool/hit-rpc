@@ -2,15 +2,13 @@ package com.jesse.netty.server;
 
 import com.jesse.entity.RpcRequest;
 import com.jesse.entity.RpcResponse;
+import com.jesse.netty.heartbeat.Beat;
 import com.jesse.reflect.CglibRefletUtils;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.extern.slf4j.Slf4j;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
@@ -27,6 +25,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcRequest rpcRequest) throws Exception {
+        if (rpcRequest.getRequestId().equals(Beat.BEAT_ID)) {
+            System.out.println("心跳接收成功!");
+            return;
+        }
         /*
          * todo 异步处理
          */
@@ -34,7 +36,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
         rpcResponse.setRequestId(rpcRequest.getRequestId());
         rpcResponse.setValue(invoke(rpcRequest));
         // 写入 RPC 响应对象并自动关闭连接
-        ctx.writeAndFlush(rpcResponse).addListener(ChannelFutureListener.CLOSE);//直接关闭 考虑是否设计为长连接
+        ctx.writeAndFlush(rpcResponse);//直接关闭 考虑是否设计为长连接
     }
 
     private Object invoke(RpcRequest rpcRequest) throws Exception {
