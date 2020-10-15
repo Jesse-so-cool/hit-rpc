@@ -69,6 +69,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
         future.addListener((ChannelFutureListener) channelFuture1 -> {
             if (future.isSuccess()) {
                 log.error("发送到缓冲成功");
+            } else {
+                log.error("发送到缓冲s失败");
+
             }
         });//直接关闭 考虑是否设计为长连接
     }

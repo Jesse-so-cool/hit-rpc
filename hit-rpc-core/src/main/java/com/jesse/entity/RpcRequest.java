@@ -1,6 +1,7 @@
 package com.jesse.entity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -8,6 +9,7 @@ import java.io.Serializable;
  * @author jesse hsj
  * @date 2020/10/10
  */
+@Accessors(chain = true)
 @Data
 public class RpcRequest implements Serializable {
     private String interfaceName;

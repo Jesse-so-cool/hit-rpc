@@ -52,7 +52,7 @@ public class CglibInterceptor implements MethodInterceptor {
         request.setParameters(objects);
 
         //map.getHandler.request
-        NettyClientHandler client = NettyClient.getClientHandler(address);
+        NettyClientHandler client = NettyClient.getInstance().getClientHandler(address);
         ResponseFuture future = client.request(request);
         return future.get();
     }

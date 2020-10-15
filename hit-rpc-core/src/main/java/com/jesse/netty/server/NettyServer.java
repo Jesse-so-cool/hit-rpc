@@ -55,8 +55,8 @@ public class NettyServer {
                         public void initChannel(SocketChannel ch) throws Exception {
                             // 添加日志
                             ch.pipeline()
-                                    .addLast(new IdleStateHandler(0, 0, Beat.BEAT_SERVER, TimeUnit.SECONDS))
-                                    .addLast(new HeartbeatServerHandler())
+                                    //.addLast(new IdleStateHandler(0, 0, Beat.BEAT_SERVER, TimeUnit.SECONDS))
+                                    //.addLast(new HeartbeatServerHandler())
                                     .addLast(new MyDecoder(RpcRequest.class, new KryoSerialization()))
                                     .addLast(new MyEncoder(RpcResponse.class, new KryoSerialization()))
                                     .addLast(new NettyServerHandler(exportServices));
