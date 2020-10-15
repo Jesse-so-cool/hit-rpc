@@ -15,6 +15,6 @@ public class RegistryCenter implements Registry{
 
     @Override
     public List<String> discover(String serviceName) {
-        return Arrays.asList("localhost:8080");
+        return Arrays.asList("127.0.0.1:8080");
     }
 }

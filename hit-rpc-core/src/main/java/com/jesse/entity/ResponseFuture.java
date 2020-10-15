@@ -1,5 +1,7 @@
 package com.jesse.entity;
 
+import com.esotericsoftware.minlog.Log;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +23,7 @@ public class ResponseFuture implements Future<RpcResponse> {
         synchronized (lock) {
             this.response = response;
             this.isDone = true;
+            lock.notifyAll();
         }
     }
 
@@ -45,11 +48,14 @@ public class ResponseFuture implements Future<RpcResponse> {
 
     @Override
     public RpcResponse get() throws InterruptedException, ExecutionException {
-        if (isDone) {
-            return response;
-        }
         synchronized (lock) {
-            lock.wait();
+            while (!isDone) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    Log.error(e.getMessage(), e);
+                }
+            }
         }
         return response;
     }

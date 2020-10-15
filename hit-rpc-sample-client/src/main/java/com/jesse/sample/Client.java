@@ -15,8 +15,9 @@ public class Client {
     public static void main(String[] args) throws InterruptedException {
         HitService hitService = new RpcProxy<HitService>().create(HitService.class);
         try {
-            String hit = hitService.hit();
-            System.out.println(hit);
+            new Thread(() -> {
+                System.out.println(hitService.hit());
+            }).start();
         } catch (Throwable e) {
             LoggerFactory.getLogger(Client.class).error(e.getMessage(), e);
         }

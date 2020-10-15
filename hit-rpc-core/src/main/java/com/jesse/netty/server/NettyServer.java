@@ -61,7 +61,9 @@ public class NettyServer {
                                     .addLast(new MyEncoder(RpcResponse.class, new KryoSerialization()))
                                     .addLast(new NettyServerHandler(exportServices));
                         }
-                    }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             ChannelFuture f = b.bind(port).sync();
 

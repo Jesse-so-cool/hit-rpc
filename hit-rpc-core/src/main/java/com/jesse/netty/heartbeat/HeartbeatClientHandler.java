@@ -16,6 +16,7 @@ public class HeartbeatClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+
         if (evt instanceof IdleStateEvent) {
             channel = ctx.channel();
             // send heartbeat

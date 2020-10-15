@@ -2,6 +2,8 @@ package com.jesse.server.service;
 
 import com.jesse.service.HitService;
 
+import java.util.concurrent.Future;
+
 /**
  * TODO
  *

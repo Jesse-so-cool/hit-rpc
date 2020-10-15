@@ -25,8 +25,31 @@ public class NettyClientHandler  extends SimpleChannelInboundHandler<RpcResponse
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         super.channelRegistered(ctx);
+        //RpcRequest request = new RpcRequest();
+        //request.setRequestId("qweqweqweqwe");
+        //ResponseFuture request1 = request(request);
+        //log.info(channel.toString() + " " + this.channel.isActive());
+        System.out.println("channelRegistered");
+
+    }
+
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelUnregistered(ctx);
+        System.out.println("channelUnregistered");
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        System.out.println("channelActive");
         this.channel = ctx.channel();
-        log.info(channel.toString());
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+        log.error("channelInactive");
     }
 
     @Override
@@ -45,10 +68,10 @@ public class NettyClientHandler  extends SimpleChannelInboundHandler<RpcResponse
         ResponseFuture responseFuture = new ResponseFuture(request);
         futureMap.put(request.getRequestId(), responseFuture);
         try {
-            if (!channel.isActive()) {
-                log.info(channel.toString());
-                System.out.println("Send isActive {} error" + request.getRequestId());
-            }
+//            if (!channel.isActive()) {
+//                log.info(channel.toString());
+//                log.error("Send is not Active ");
+//            }
             ChannelFuture channelFuture = channel.writeAndFlush(request).sync();
             if (!channelFuture.isSuccess()) {
                 System.out.println("Send request {} error" + request.getRequestId());
