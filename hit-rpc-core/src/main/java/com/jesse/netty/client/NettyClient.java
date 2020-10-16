@@ -41,7 +41,12 @@ public class NettyClient {
     }
 
     public NettyClientHandler getClientHandler(String address) throws Exception {
-        connect(address);
+        NettyClientHandler handler = pool.get(address);
+        if (handler != null) {
+            return handler;
+        } else {
+            connect(address);
+        }
         //int size = map.values().size();
         synchronized (lock) {
             while (pool.values().size() == 0) {
@@ -52,9 +57,8 @@ public class NettyClient {
                 }
             }
         }
-        NettyClientHandler handler = pool.get(address);
+        handler = pool.get(address);
         if (handler != null) {
-
             return handler;
         } else {
             throw new Exception("Can not get available connection");
@@ -73,7 +77,7 @@ public class NettyClient {
                             public void initChannel(SocketChannel ch) throws Exception {
                                 ch.pipeline()
                                         //客户端只需要设置read超时
-                                        .addLast(new IdleStateHandler(0, 0, Beat.BEAT_CLIENT, TimeUnit.SECONDS))    // beat N, close if fail
+                                        //.addLast(new IdleStateHandler(0, 0, Beat.BEAT_CLIENT, TimeUnit.SECONDS))    // beat N, close if fail
                                         //.addLast(new HeartbeatClientHandler())
                                         .addLast(new MyEncoder(RpcRequest.class, new KryoSerialization()))
                                         .addLast(new MyDecoder(RpcResponse.class, new KryoSerialization()))
@@ -86,19 +90,20 @@ public class NettyClient {
                 ;
                 String[] split = address.split(":");
                 // 启动客户端
-                ChannelFuture channelFuture = bootstrap.connect(split[0], Integer.parseInt(split[1])).sync();
-                System.out.println(channelFuture.channel().isActive());
+                ChannelFuture channelFuture = bootstrap.connect(split[0], Integer.parseInt(split[1]));
+                //System.out.println(channelFuture.channel().isActive());
                 channelFuture.addListener((ChannelFutureListener) channelFuture1 -> {
                     if (channelFuture.isSuccess()) {
                         NettyClientHandler handler = channelFuture1.channel().pipeline().get(NettyClientHandler.class);
                         pool.put(address, handler);
                         signalAvailableHandler();
-                        handler.request(new RpcRequest().setRequestId("aaaaaaaaaaaaaaaaaaaaa"));
+                        //handler.request(new RpcRequest().setRequestId("aaaaaaaaaaaaaaaaaaaaa"));
                     } else {
                         System.out.println("我失败了？？？？？？？？？？？");
                     }
-                });
-
+                }).sync();
+//              等待连接关闭
+                channelFuture.channel().closeFuture().sync();//去掉这句代码会有大问题 TODO 需要学习下
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {

@@ -68,10 +68,6 @@ public class NettyClientHandler  extends SimpleChannelInboundHandler<RpcResponse
         ResponseFuture responseFuture = new ResponseFuture(request);
         futureMap.put(request.getRequestId(), responseFuture);
         try {
-//            if (!channel.isActive()) {
-//                log.info(channel.toString());
-//                log.error("Send is not Active ");
-//            }
             ChannelFuture channelFuture = channel.writeAndFlush(request).sync();
             if (!channelFuture.isSuccess()) {
                 System.out.println("Send request {} error" + request.getRequestId());

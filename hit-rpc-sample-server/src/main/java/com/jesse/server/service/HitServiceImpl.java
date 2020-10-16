@@ -15,4 +15,8 @@ public class HitServiceImpl implements HitService {
     public String hit() {
         return "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊";
     }
+
+    public String hit(String name) {
+        return "hit" + name;
+    }
 }

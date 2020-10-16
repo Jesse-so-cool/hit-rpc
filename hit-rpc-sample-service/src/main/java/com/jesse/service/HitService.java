@@ -12,4 +12,6 @@ public interface HitService {
 
     public String hit();
 
+    public String hit(String name);
+
 }

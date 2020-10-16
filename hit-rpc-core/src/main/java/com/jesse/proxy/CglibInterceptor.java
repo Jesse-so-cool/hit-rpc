@@ -41,8 +41,6 @@ public class CglibInterceptor implements MethodInterceptor {
 
         //负载均衡策略
         String address = loadBalance.select(ls,declaringClass.getName());
-        String[] split = address.split(":");
-        //NettyClient nettyClient = new NettyClient(split[0], Integer.parseInt(split[1]));
         RpcRequest request = new RpcRequest();
 
         request.setRequestId(UUID.randomUUID().toString());
@@ -53,8 +51,11 @@ public class CglibInterceptor implements MethodInterceptor {
 
         //map.getHandler.request
         NettyClientHandler client = NettyClient.getInstance().getClientHandler(address);
+        long l = System.currentTimeMillis();
         ResponseFuture future = client.request(request);
-        return future.get();
+        System.out.println(System.currentTimeMillis() - l);
+
+        return future.get().getValue();
     }
 
 }
