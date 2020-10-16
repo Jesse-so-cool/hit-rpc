@@ -8,6 +8,7 @@ import java.util.List;
  * @date 2020/10/11
  */
 public class RegistryCenter implements Registry{
+
     @Override
     public void register(String serviceName, String serviceAddress) {
 

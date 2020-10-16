@@ -27,24 +27,17 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
 
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         super.channelRegistered(ctx);
-        //RpcRequest request = new RpcRequest();
-        //request.setRequestId("qweqweqweqwe");
-        //ResponseFuture request1 = request(request);
-        //log.info(channel.toString() + " " + this.channel.isActive());
-        System.out.println("channelRegistered");
 
     }
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         super.channelUnregistered(ctx);
-        System.out.println("channelUnregistered");
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        System.out.println("channelActive");
     }
 
     @Override
@@ -55,7 +48,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcRequest rpcRequest) throws Exception {
         if (rpcRequest.getRequestId().equals(Beat.BEAT_ID)) {
-            System.out.println("心跳接收成功!");
+            log.debug("心跳接收成功!");
             return;
         }
         /*
@@ -67,13 +60,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
         // 写入 RPC 响应对象并自动关闭连接
         ChannelFuture future = ctx.writeAndFlush(rpcResponse);
         future.addListener((ChannelFutureListener) channelFuture1 -> {
-            if (future.isSuccess()) {
-                log.error("发送到缓冲成功");
-            } else {
-                log.error("发送到缓冲s失败");
-
+            if (!future.isSuccess()) {
+                log.error("发送到缓冲失败");
             }
-        });//直接关闭 考虑是否设计为长连接
+        });
     }
 
     private Object invoke(RpcRequest rpcRequest) throws Exception {

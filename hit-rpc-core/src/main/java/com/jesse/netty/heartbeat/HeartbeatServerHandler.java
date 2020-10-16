@@ -17,12 +17,12 @@ public class HeartbeatServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt)
             throws Exception {
-//        if (evt instanceof IdleStateEvent) {
-//            ctx.channel().close();
-//            System.out.println("读写超时 直接断开");
-//        } else {
+        if (evt instanceof IdleStateEvent) {
+            ctx.channel().close();
+            System.out.println("读写超时 直接断开");
+        } else {
             super.userEventTriggered(ctx, evt);
-        //}
+        }
     }
 
 }

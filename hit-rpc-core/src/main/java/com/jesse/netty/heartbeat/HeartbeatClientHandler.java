@@ -3,6 +3,7 @@ package com.jesse.netty.heartbeat;
 import com.jesse.entity.RpcRequest;
 import io.netty.channel.*;
 import io.netty.handler.timeout.IdleStateEvent;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * TODO
@@ -10,6 +11,7 @@ import io.netty.handler.timeout.IdleStateEvent;
  * @author jesse hsj
  * @date 2020/10/13 11:11
  */
+@Slf4j
 public class HeartbeatClientHandler extends ChannelInboundHandlerAdapter {
 
     private Channel channel;
@@ -27,7 +29,7 @@ public class HeartbeatClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void sendHeartBeat() {
-        channel.writeAndFlush(Beat.BEAT_CLIENT);
-        System.out.println("client send heartbeat! ");
+        channel.writeAndFlush(Beat.BEAT_REQUEST);
+        log.debug("client send heartbeat! " + channel.isActive());
     }
 }

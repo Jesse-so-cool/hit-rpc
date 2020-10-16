@@ -5,6 +5,7 @@ import com.jesse.entity.RpcResponse;
 import com.jesse.netty.codec.MyDecoder;
 import com.jesse.netty.codec.MyEncoder;
 import com.jesse.netty.heartbeat.Beat;
+import com.jesse.netty.heartbeat.HeartbeatClientHandler;
 import com.jesse.serialization.KryoSerialization;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -41,13 +42,7 @@ public class NettyClient {
     }
 
     public NettyClientHandler getClientHandler(String address) throws Exception {
-        NettyClientHandler handler = pool.get(address);
-        if (handler != null) {
-            return handler;
-        } else {
-            connect(address);
-        }
-        //int size = map.values().size();
+        connect(address);
         synchronized (lock) {
             while (pool.values().size() == 0) {
                 try {
@@ -57,7 +52,7 @@ public class NettyClient {
                 }
             }
         }
-        handler = pool.get(address);
+        NettyClientHandler handler = pool.get(address);
         if (handler != null) {
             return handler;
         } else {
@@ -66,6 +61,8 @@ public class NettyClient {
     }
 
     public void connect(String address) throws InterruptedException {
+        if(pool.containsKey(address))
+            return;
         Thread thread = new Thread(() -> {
 
             try {
@@ -77,8 +74,8 @@ public class NettyClient {
                             public void initChannel(SocketChannel ch) throws Exception {
                                 ch.pipeline()
                                         //客户端只需要设置read超时
-                                        //.addLast(new IdleStateHandler(0, 0, Beat.BEAT_CLIENT, TimeUnit.SECONDS))    // beat N, close if fail
-                                        //.addLast(new HeartbeatClientHandler())
+                                        .addLast(new IdleStateHandler(Beat.BEAT_CLIENT, 0, 0, TimeUnit.SECONDS))    // beat N, close if fail
+                                        .addLast(new HeartbeatClientHandler())
                                         .addLast(new MyEncoder(RpcRequest.class, new KryoSerialization()))
                                         .addLast(new MyDecoder(RpcResponse.class, new KryoSerialization()))
                                         .addLast(new NettyClientHandler());
@@ -89,9 +86,7 @@ public class NettyClient {
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
                 ;
                 String[] split = address.split(":");
-                // 启动客户端
                 ChannelFuture channelFuture = bootstrap.connect(split[0], Integer.parseInt(split[1]));
-                //System.out.println(channelFuture.channel().isActive());
                 channelFuture.addListener((ChannelFutureListener) channelFuture1 -> {
                     if (channelFuture.isSuccess()) {
                         NettyClientHandler handler = channelFuture1.channel().pipeline().get(NettyClientHandler.class);
