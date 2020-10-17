@@ -94,7 +94,7 @@ public class NettyClient {
                         signalAvailableHandler();
                         //handler.request(new RpcRequest().setRequestId("aaaaaaaaaaaaaaaaaaaaa"));
                     } else {
-                        System.out.println("我失败了？？？？？？？？？？？");
+                        System.out.println("出事,连接失败");
                     }
                 }).sync();
 //              等待连接关闭

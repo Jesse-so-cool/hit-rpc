@@ -1,9 +1,11 @@
 package com.jesse.spring;
 
+import com.alibaba.nacos.api.exception.NacosException;
 import com.jesse.annotation.HitService;
 import com.jesse.config.Properties;
 import com.jesse.netty.server.NettyServer;
 import com.jesse.reflect.CglibRefletUtils;
+import com.jesse.registry.RegistryCenter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,10 +27,25 @@ import java.util.Map;
 @Slf4j
 public class ServerInitializer implements ApplicationContextAware, InitializingBean, DisposableBean {
 
+    static InetAddress addr;
+
+    private static int port = 23333;
+
+    static {
+        try {
+            port = System.getProperty("hit.rpc.port") == null ? port : Integer.parseInt(System.getProperty("hit.rpc.port"));
+            addr = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Map<String, Object> exportServices = new HashMap<String, Object>();
 
-    public void exportServices(Object o, String version) {
+
+    public void exportServices(Object o, String version) throws NacosException {
         exportServices.put(CglibRefletUtils.getServiceKey(o.getClass().getInterfaces()[0].getName(), version), o);
+        new RegistryCenter().register(CglibRefletUtils.getServiceKey(o.getClass().getInterfaces()[0].getName(), version), addr.getHostAddress(), port);
     }
 
     private ApplicationContext applicationContext = null;
@@ -39,7 +58,7 @@ public class ServerInitializer implements ApplicationContextAware, InitializingB
     @Override
     public void afterPropertiesSet() throws Exception {
         if (applicationContext == null) {
-            NettyServer nettyServer = new NettyServer(8080, exportServices);
+            NettyServer nettyServer = new NettyServer(port, exportServices);
             nettyServer.start();
             return;
         }

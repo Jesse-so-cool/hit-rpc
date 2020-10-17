@@ -21,7 +21,7 @@ public class CglibRefletUtils {
         if (version == null || version.equals("")) {
             return serviceName;
         }
-        return serviceName + "-" + version;
+        return serviceName + ":" + version;
     }
 
     public static Object invoke(Object o, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws InvocationTargetException {

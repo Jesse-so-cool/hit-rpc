@@ -8,9 +8,9 @@ import net.sf.cglib.proxy.Enhancer;
  */
 public class RpcProxy<T> {
 
-    public T create(Class<T> clazz) {
+    public T create(Class<T> clazz,String version) {
         Enhancer enhancer = new Enhancer();
-        enhancer.setCallback(new CglibInterceptor());
+        enhancer.setCallback(new CglibInterceptor(version));
         enhancer.setInterfaces(new Class[]{clazz});
         return (T) enhancer.create();
     }

@@ -7,6 +7,7 @@ import com.jesse.entity.RpcRequest;
 import com.jesse.entity.RpcResponse;
 import com.jesse.netty.client.NettyClient;
 import com.jesse.netty.client.NettyClientHandler;
+import com.jesse.reflect.CglibRefletUtils;
 import com.jesse.registry.RegistryCenter;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -25,6 +26,12 @@ public class CglibInterceptor implements MethodInterceptor {
 
     private LoadBalance loadBalance = new RoundRobinLoadBalance();
 
+    private String version = null;
+
+    public CglibInterceptor(String version) {
+        this.version = version;
+    }
+
     CglibInterceptor() {
 
     }
@@ -37,10 +44,10 @@ public class CglibInterceptor implements MethodInterceptor {
     public Object intercept(Object object, Method method, Object[] objects,
                             MethodProxy methodProxy) throws Throwable {
         Class<?> declaringClass = method.getDeclaringClass();
-        List<String> ls = new RegistryCenter().discover(declaringClass.getName());
+        List<String> ls = new RegistryCenter().discover(CglibRefletUtils.getServiceKey(declaringClass.getName(),this.version));
 
         //负载均衡策略
-        String address = loadBalance.select(ls,declaringClass.getName());
+        String address = loadBalance.select(ls,CglibRefletUtils.getServiceKey(declaringClass.getName(),this.version));
         RpcRequest request = new RpcRequest();
 
         request.setRequestId(UUID.randomUUID().toString());
@@ -48,7 +55,7 @@ public class CglibInterceptor implements MethodInterceptor {
         request.setMethodName(method.getName());
         request.setParameterTypes(method.getParameterTypes());
         request.setParameters(objects);
-
+        request.setVersion(this.version);
         //map.getHandler.request
         NettyClientHandler client = NettyClient.getInstance().getClientHandler(address);
         long l = System.currentTimeMillis();
