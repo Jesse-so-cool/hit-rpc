@@ -15,9 +15,10 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
         ServerInitializer initializer = new ServerInitializer();
+        initializer.setPort(23333);
         HitService o = new HitServiceImpl();
         initializer.exportServices(o, "1.1.1");
-        initializer.afterPropertiesSet();
+        initializer.start();
     }
 
 }

@@ -14,7 +14,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -25,13 +27,15 @@ import java.util.concurrent.TimeUnit;
  * @date 2020/10/11
  */
 public class NettyClient {
+
     EventLoopGroup workerGroup = new NioEventLoopGroup();
-    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4, 8,
+    private ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4, 8,
             600L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(1000));
 
-    private static Map<String, NettyClientHandler> pool = new ConcurrentHashMap<>();
+    private Map<String, NettyClientHandler> pool = new ConcurrentHashMap<>();
+    private Map<String, Set<String>> serviceAddrs = new ConcurrentHashMap<>();
 
-    private static Object lock = new Object();
+    private Object lock = new Object();
 
     private static class SingletonHolder {
         private static final NettyClient instance = new NettyClient();
@@ -39,6 +43,10 @@ public class NettyClient {
 
     public static NettyClient getInstance() {
         return SingletonHolder.instance;
+    }
+
+    public Set<String> getServiceAddrs(String serviceName) {
+        return serviceAddrs.get(serviceName);
     }
 
     public NettyClientHandler getClientHandler(String address) throws Exception {
@@ -108,7 +116,7 @@ public class NettyClient {
         threadPoolExecutor.submit(thread);
     }
 
-    private static void signalAvailableHandler() {
+    private void signalAvailableHandler() {
         synchronized (lock) {
             lock.notifyAll();
         }

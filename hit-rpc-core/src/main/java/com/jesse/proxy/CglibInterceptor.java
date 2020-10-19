@@ -13,6 +13,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,10 +45,10 @@ public class CglibInterceptor implements MethodInterceptor {
     public Object intercept(Object object, Method method, Object[] objects,
                             MethodProxy methodProxy) throws Throwable {
         Class<?> declaringClass = method.getDeclaringClass();
-        List<String> ls = new RegistryCenter().discover(CglibRefletUtils.getServiceKey(declaringClass.getName(),this.version));
-
+        String serviceKey = CglibRefletUtils.getServiceKey(declaringClass.getName(), this.version);
+        List<String> ls = new ArrayList<>(NettyClient.getInstance().getServiceAddrs(serviceKey));
         //负载均衡策略
-        String address = loadBalance.select(ls,CglibRefletUtils.getServiceKey(declaringClass.getName(),this.version));
+        String address = loadBalance.select(ls, serviceKey);
         RpcRequest request = new RpcRequest();
 
         request.setRequestId(UUID.randomUUID().toString());
