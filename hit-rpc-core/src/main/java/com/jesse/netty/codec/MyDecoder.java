@@ -19,6 +19,13 @@ public class MyDecoder extends ByteToMessageDecoder {
         this.serialization = serialization;
     }
 
+    /**
+     * 粘包自定义拆包
+     * @param channelHandlerContext
+     * @param byteBuf
+     * @param list
+     * @throws Exception
+     */
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
         if (byteBuf.readableBytes() < 4) {
