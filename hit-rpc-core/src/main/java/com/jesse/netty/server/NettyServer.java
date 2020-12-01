@@ -22,6 +22,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,19 +31,18 @@ import java.util.concurrent.TimeUnit;
  */
 public class NettyServer {
 
-    private Map<String, Object> exportServices;
+    public Map<String, Object> exportServices = new ConcurrentHashMap<>();
 
+    protected int port;
 
-//    public static void main(String[] args) throws Exception {
-//        new NettyServer(8080).start();
-//    }
-
-    private int port;
-
-    public NettyServer(int port, Map<String, Object> exportServices) {
+    public void setPort(int port) {
         this.port = port;
-        this.exportServices = exportServices;
     }
+
+//    public NettyServer(int port, Map<String, Object> exportServices) {
+//        this.port = port;
+//        this.exportServices = exportServices;
+//    }
 
     public void start() throws Exception{
         EventLoopGroup bossGroup = new NioEventLoopGroup();

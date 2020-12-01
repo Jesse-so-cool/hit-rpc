@@ -17,12 +17,12 @@ import java.util.List;
 public class RegistryCenter implements Registry {
 
     private static NamingService naming;
-    static {
+
+    public RegistryCenter(String address) {
         try {
-            String property = System.getProperty("registry.nacos.serveAddr");
-            naming = NamingFactory.createNamingService("127.0.0.1:8848");
-        }catch (NacosException e){
-            log.info("nacos serverAddr not exist");
+            naming = NamingFactory.createNamingService(address);
+        } catch (NacosException e) {
+            e.printStackTrace();
         }
     }
 

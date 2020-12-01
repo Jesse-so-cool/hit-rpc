@@ -6,6 +6,7 @@ import com.jesse.config.Properties;
 import com.jesse.netty.server.NettyServer;
 import com.jesse.reflect.CglibRefletUtils;
 import com.jesse.registry.RegistryCenter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -25,27 +26,27 @@ import java.util.Map;
  * @date 2020/10/12 15:35
  */
 @Slf4j
-public class ServerInitializer implements ApplicationContextAware, InitializingBean, DisposableBean {
+public class ServerInitializer extends NettyServer implements ApplicationContextAware, InitializingBean, DisposableBean {
 
-    static InetAddress addr;
+    public InetAddress addr;
 
-    private static int port = 23333;
+    public RegistryCenter registryCenter;
 
-    static {
+    public void setRegistryCenterAddr(String addr) {
+        this.registryCenter = new RegistryCenter(addr);
+    }
+
+    {
         try {
-            port = System.getProperty("hit.rpc.port") == null ? port : Integer.parseInt(System.getProperty("hit.rpc.port"));
             addr = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
     }
 
-    private Map<String, Object> exportServices = new HashMap<String, Object>();
-
-
     public void exportServices(Object o, String version) throws NacosException {
         exportServices.put(CglibRefletUtils.getServiceKey(o.getClass().getInterfaces()[0].getName(), version), o);
-        new RegistryCenter().register(CglibRefletUtils.getServiceKey(o.getClass().getInterfaces()[0].getName(), version), addr.getHostAddress(), port);
+        registryCenter.register(CglibRefletUtils.getServiceKey(o.getClass().getInterfaces()[0].getName(), version), addr.getHostAddress(), port);
     }
 
     private ApplicationContext applicationContext = null;
@@ -57,18 +58,7 @@ public class ServerInitializer implements ApplicationContextAware, InitializingB
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (applicationContext == null) {
-            NettyServer nettyServer = new NettyServer(port, exportServices);
-            nettyServer.start();
-            return;
-        }
-
-        Properties properties = (Properties) applicationContext.getBean("properties");
-        if (properties == null || properties.getPort() == null) {
-            log.info("properties error...");
-        }
-        NettyServer nettyServer = new NettyServer(properties.getPort(), exportServices);
-        nettyServer.start();
+        this.start();
     }
 
     @Override
@@ -83,6 +73,8 @@ public class ServerInitializer implements ApplicationContextAware, InitializingB
                 exportServices.put(CglibRefletUtils.getServiceKey(bean.getClass().getInterfaces()[0].getName(), version), bean);
             }
         }
+
+
     }
 
 
